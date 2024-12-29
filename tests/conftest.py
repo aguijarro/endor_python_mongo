@@ -9,10 +9,8 @@ def get_settings_override():
     return Settings(
         PROJECT_NAME="FastAPI Test App",
         DEBUG=True,
-        DATABASE_URL=os.environ.get(
-            "DATABASE_TEST_URL",
-            "postgresql://postgres:postgres@endor_python_db:5432/endor_python_test"
-        ),
+        MONGODB_URL="mongodb://endor_python_mongodb:27017",
+        MONGODB_DB_NAME="endor_python_test",
         ALLOWED_ORIGINS="http://localhost:3000",
         ENVIRONMENT="test"
     )
