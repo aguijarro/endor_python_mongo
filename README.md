@@ -134,3 +134,29 @@ docker-compose -f infrastructure/docker/development/docker-compose.dev.yml exec 
 docker-compose -f infrastructure/docker/development/docker-compose.dev.yml restart endor_python_dev
 
 curl -X POST "http://localhost:8005/api/v1/test/?name=test1"
+
+
+
+### MongoDB
+
+# Remove services
+docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans
+
+# Start the services
+docker-compose -f infrastructure/docker/development/docker-compose.dev.yml up -d
+
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# See logs
+docker-compose -f docker-compose.dev.yml logs -f endor_python_dev
+
+
+
+# Test the health endpoint
+curl http://localhost:8005/api/v1/health
+
+# Create a test record
+curl -X POST "http://localhost:8005/api/v1/test/?name=test1"
+
+# Get all test records
+curl http://localhost:8005/api/v1/test/

@@ -1,21 +1,24 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.database import get_db
-from app.models.test import Test
-from sqlalchemy import text
+from fastapi import APIRouter
+from app.core.mongodb import db
+from datetime import datetime
 
 router = APIRouter()
 
 @router.post("/")
-async def create_test(name: str, db: AsyncSession = Depends(get_db)):
-    test_item = Test(name=name)
-    db.add(test_item)
-    await db.commit()
-    await db.refresh(test_item)
+async def create_test(name: str):
+    test_item = {
+        "name": name,
+        "created_at": datetime.utcnow()
+    }
+    result = await db.db.test_collection.insert_one(test_item)
+    test_item["_id"] = str(result.inserted_id)
     return test_item
 
 @router.get("/")
-async def read_tests(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(text("SELECT * FROM test_table"))
-    tests = [dict(row._mapping) for row in result.all()]
+async def read_tests():
+    cursor = db.db.test_collection.find({})
+    tests = []
+    async for document in cursor:
+        document["_id"] = str(document["_id"])
+        tests.append(document)
     return tests
